@@ -17,6 +17,8 @@ according to the [pyarpes documentation](https://arpes.readthedocs.io/en/latest/
 | tilt  |  beta   |
 |  phi  |   chi   |
 | alpha |   phi   |
+|   0   |   psi   |
+|  -90° |  alpha  |
 
 """
 
@@ -75,23 +77,31 @@ class PearlEndstation(SingleFileEndstation, SynchrotronEndstation, Hemispherical
         "ManipulatorX": "z",
         "ManipulatorY": "x",
         "ManipulatorZ": "y",
-        "ScientaSlices": "phi",
-        "ScientaChannels": "eV",
         "ManipulatorTempA": "temperature_cryotip",
         "ManipulatorTempB": "temperature",
-        "MonoEnergy": "hv",
-        "RefCurrent": "photon_flux",
+
+        "ScientaSlices": "phi",
+        "ScientaChannels": "eV",
         "ScientaCenterEnergy": "daq_center_energy",
         "ScientaLowEnergy": "sweep_low_energy",
         "ScientaHighEnergy": "sweep_high_energy",
         "StepSize": "sweep_step",
         "NumIterations": "n_sweeps",
-        "LensMode": "lens_mode_name",
+        "LensMode": "lens_mode",
         "PassEnergy": "pass_energy",
-        "RingCurrent": "beam_current",
-        "AcquisitionMode": "daq_type",
+        # "AcquisitionMode": "acquisition_mode",
+        "ScientaDwellTime": "dwell_time",
+        "AnalyserSlit": "slit",
         "RegionName": "fixed_region_name",
-        "ScientaDwellTime": "dwell_time"
+
+        "MonoEnergy": "hv",
+        "MonoGrating": "grating_lines_per_mm",
+        "ExitSlit": "exit_slit",
+
+        "RingCurrent": "beam_current",
+        "RefCurrent": "photon_flux",
+        "SampleCurrent": "photocurrent",
+        "ChamberPressure": "pressure",
     }
 
     TRANSFORM_FUNCS = {
@@ -102,6 +112,7 @@ class PearlEndstation(SingleFileEndstation, SynchrotronEndstation, Hemispherical
         "SampleCurrent": lambda x: x * 1e9,
         "RefCurrent": lambda x: x * 1e9,
         "RingCurrent": lambda x: x * 1e6,
+        # "MonoGrating": lambda x: int(str(x).split("_")[1])
         }
     
     ATTR_TRANSFORMS = {
@@ -110,7 +121,6 @@ class PearlEndstation(SingleFileEndstation, SynchrotronEndstation, Hemispherical
             "lens_mode": None,
             "lens_mode_name": l,
         },
-        "undulator_polarization": int,
         "region_name": lambda l: {
             "daq_region_name": l,
             "daq_region": l,
@@ -211,7 +221,7 @@ class PearlEndstation(SingleFileEndstation, SynchrotronEndstation, Hemispherical
             pass
         else:
             try:
-                attrs['authors'] = ", ".join([v.decode() for v in general['authors']])
+                attrs['experimenter'] = ", ".join([v.decode() for v in general['authors']])
             except KeyError:
                 pass
             try:
@@ -219,7 +229,7 @@ class PearlEndstation(SingleFileEndstation, SynchrotronEndstation, Hemispherical
             except KeyError:
                 pass
             try:
-                attrs['sample'] = general['sample'][()].decode()
+                attrs['sample_name'] = general['sample'][()].decode()
             except KeyError:
                 pass
 
